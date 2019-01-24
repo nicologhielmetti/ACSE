@@ -1,0 +1,19 @@
+int result = 1, input_v;
+read(input_v);
+write(input_v);
+if(input_v != 0){
+  result = input_v;
+  input_v--;
+}
+while(input_v > 0){
+  result  = result * input_v;
+  input_v--;
+}
+write(result);
+/*
+int v[3];
+v[0] = 1;
+v[1] = 2;
+v[2] = 3;
+write(red(v));
+*/

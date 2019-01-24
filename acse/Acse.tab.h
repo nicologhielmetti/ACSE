@@ -77,14 +77,16 @@ extern int yydebug;
     RETURN = 287,
     READ = 288,
     WRITE = 289,
-    DO = 290,
-    WHILE = 291,
-    IF = 292,
-    ELSE = 293,
-    TYPE = 294,
-    IDENTIFIER = 295,
-    NUMBER = 296,
-    NOT = 297
+    REDUCE = 290,
+    DOUBLE_MINUS = 291,
+    DO = 292,
+    WHILE = 293,
+    IF = 294,
+    ELSE = 295,
+    TYPE = 296,
+    IDENTIFIER = 297,
+    NUMBER = 298,
+    NOT = 299
   };
 #endif
 
@@ -94,7 +96,7 @@ extern int yydebug;
 union YYSTYPE
 {
 #line 103 "Acse.y" /* yacc.c:1909  */
-            
+
    int intval;
    char *svalue;
    t_axe_expression expr;
@@ -103,7 +105,7 @@ union YYSTYPE
    t_axe_label *label;
    t_while_statement while_stmt;
 
-#line 107 "Acse.tab.h" /* yacc.c:1909  */
+#line 109 "Acse.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
