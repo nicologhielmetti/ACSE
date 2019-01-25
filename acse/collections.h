@@ -1,10 +1,10 @@
 /*
  * Andrea Di Biagio
  * Politecnico di Milano, 2007
- * 
+ *
  * collections.h
  * Formal Languages & Compilers Machine, 2007/2008
- * 
+ *
  */
 
 #ifndef _COLLECTIONS_H
@@ -35,7 +35,6 @@ typedef struct t_list
 	struct t_list *next;
 	struct t_list *prev;
 }t_list;
-
 
 /* add an element `data' to the list `list' at position `pos'. If pos is negative
  * , or is larger than the number of elements in the list, the new element is

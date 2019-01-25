@@ -98,8 +98,13 @@ ID       [a-zA-Z_][a-zA-Z0-9_]*
 "read"            { return READ; }
 "write"           { return WRITE; }
 
-"red"             {return REDUCE; }
-"--"              { return DOUBLE_MINUS; }
+"red"             { return REDUCE; }
+"is-empty"        { return IS_EMPTY; }
+"is-full"         { return IS_FULL; }
+"push"            { return PUSH; }
+"into"            { return INTO; }
+"pop"             { return POP; }
+"from"            { return FROM; }
 {ID}              { yylval.svalue=strdup(yytext); return IDENTIFIER; }
 {DIGIT}+          { yylval.intval = atoi( yytext );
                     return(NUMBER); }

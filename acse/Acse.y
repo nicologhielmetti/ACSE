@@ -89,6 +89,17 @@ t_reg_allocator *RA;       /* Register allocator. It implements the "Linear scan
 
 t_io_infos *file_infos;    /* input and output files used by the compiler */
 
+struct t_stack {
+  char* id;
+  int index_reg;
+} stack = {NULL, 0};
+
+t_list stacks;
+
+
+int compareFunction(t_stack * a, t_stack * b){
+  return strcmp(a->id,b->id);
+}
 
 extern int yylex(void);
 extern int yyerror(const char* errmsg);
@@ -125,7 +136,8 @@ extern int yyerror(const char* errmsg);
 %token READ
 %token WRITE
 %token REDUCE
-%token DOUBLE_MINUS
+%token PUSH POP FROM INTO
+%token IS_FULL IS_EMPTY
 
 %token <label> DO
 %token <while_stmt> WHILE
@@ -155,8 +167,8 @@ extern int yyerror(const char* errmsg);
 %left SHL_OP SHR_OP
 %left MINUS PLUS
 %left MUL_OP DIV_OP
-%nonassoc DOUBLE_MINUS
 %right NOT
+%right IS_EMPTY IS_FULL
 
 /*=========================================================================
                          BISON GRAMMAR
@@ -249,7 +261,63 @@ statements  : statements statement       { /* does nothing */ }
 statement   : assign_statement SEMI      { /* does nothing */ }
             | control_statement          { /* does nothing */ }
             | read_write_statement SEMI  { /* does nothing */ }
+            | push_pop_statement         { /* does nothing */ }
             | SEMI            { gen_nop_instruction(program); }
+;
+
+push_pop_statement : push_statement      { /* does nothing */ }
+            | pop_statement              { /* does nothing */ }
+;
+
+push_statement : PUSH exp INTO IDENTIFIER
+            {
+              t_axe_variable* v = getVariable(program, $4);
+    					if ( v->isArray == 0 )
+    							notifyError(AXE_SYNTAX_ERROR);
+    					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
+    						stack.id = strdup($4);
+    						stack.index_reg = gen_load_immediate(program, 0);
+    					}
+    					if ( strcmp(stack.id, $4) ) 				// if ID is different from the previously stored ID then raise an error
+    						notifyError(AXE_SYNTAX_ERROR);
+              else{
+                t_axe_label *l = newLabel(program);
+                int r = getNewRegister(program);
+                gen_subi_instruction(program, r, stack.index_reg, v->arraySize);				// check if stack is not full
+                gen_beq_instruction(program, l, 0);
+                storeArrayElement(program, stack.id, create_expression(stack.index_reg, REGISTER), $2);		// push $2
+                gen_addi_instruction(program, stack.index_reg, stack.index_reg, 1);								// update the top-of-stack
+                assignLabel(program, l);																// fix label to avoid push if full
+              }
+              free($4);
+            }
+;
+
+pop_statement : POP IDENTIFIER FROM IDENTIFIER
+            {
+    					t_axe_variable* v = getVariable(program, $4);
+    					if ( v->isArray == 0 )
+    							notifyError(AXE_SYNTAX_ERROR);
+    					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
+    						stack.id = strdup($4);
+    						stack.index_reg = gen_load_immediate(program, 0);
+    					}
+    					if ( strcmp(stack.id, $4) ) 				// if ID is different from the previously stored ID then raise an error
+    						notifyError(AXE_SYNTAX_ERROR);
+                   else{
+                   	t_axe_label *l = newLabel(program);
+                   	int r = getNewRegister(program);
+                   	gen_subi_instruction(program, r, stack.index_reg, 0);				// check if stack is not empty
+                   	gen_beq_instruction(program, l, 0);
+                   	gen_subi_instruction(program, r, stack.index_reg, 1);
+                   	r = loadArrayElement(program, stack.id, create_expression(r, REGISTER));		// pop
+                   	gen_addi_instruction(program, get_symbol_location(program, $2, 0), r, 0);
+                   	gen_subi_instruction(program, stack.index_reg, stack.index_reg, 1);								// update the top-of-stack
+                   	assignLabel(program, l);																// fix label to avoid pop if empty
+                   }
+                   free($2);
+                   free($4);
+            }
 ;
 
 control_statement : if_statement         { /* does nothing */ }
@@ -590,21 +658,45 @@ exp: NUMBER      { $$ = create_expression ($1, IMMEDIATE); }
                      gen_andb_instruction(program, i_reg, i_reg, i_reg, CG_DIRECT_ALL);
                      gen_bne_instruction(program,backedge,0);
                      free($3);
-   }
-   | exp DOUBLE_MINUS {
-                          if($1.expression_type == IMMEDIATE)
-                          {
-                            $$ = create_expression($1.value--, IMMEDIATE);
-                          }
-                          else
-                          {
-                            //$$ = create_expression(getNewRegister(program),REGISTER);
-                            int r;
-                            r = gen_load_immediate(program,1);
-                            //gen_subi_instruction(program,$$.value,$$.value,1);
-                            $$ = handle_bin_numeric_op(program,$1,create_expression(r,REGISTER),SUB);
-                          }
-                      }
+                   }
+   | IS_EMPTY IDENTIFIER {
+					t_axe_variable* v = getVariable(program, $2);
+
+					if ( v->isArray == 0 )
+							notifyError(AXE_SYNTAX_ERROR);
+
+					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
+						stack.id = strdup($2);
+						stack.index_reg = gen_load_immediate(program, 0);
+						$$ = create_expression(1, IMMEDIATE);
+					}
+					else{
+						if ( strcmp(stack.id, $2) ) 				   // if ID is different from the previously stored ID then raise an error
+							notifyError(AXE_SYNTAX_ERROR);
+		            else
+		            	$$ = handle_binary_comparison (program, create_expression(stack.index_reg, REGISTER), create_expression(0, IMMEDIATE), _EQ_);
+					}
+               free($2);
+                   }
+  | IS_FULL IDENTIFIER  {
+    t_axe_variable* v = getVariable(program, $2);
+
+					if ( v->isArray == 0 )
+							notifyError(AXE_SYNTAX_ERROR);
+
+					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
+						stack.id = strdup($2);
+						stack.index_reg = gen_load_immediate(program, 0);
+						$$ = create_expression(0, IMMEDIATE);
+					}
+					else{
+						if ( strcmp(stack.id, $2) ) 				   // if ID is different from the previously stored ID then raise an error
+							notifyError(AXE_SYNTAX_ERROR);
+		            else
+		            	$$ = handle_binary_comparison (program, create_expression(stack.index_reg, REGISTER), create_expression(v->arraySize, IMMEDIATE), _EQ_);
+					}
+               free($2);
+                   }
 ;
 
 %%
