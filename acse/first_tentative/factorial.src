@@ -1,4 +1,4 @@
-int result = 1, input_v;
+/*int result = 1, input_v;
 read(input_v);
 write(input_v);
 if(input_v != 0){
@@ -10,10 +10,24 @@ while(input_v > 0){
   input_v--;
 }
 write(result);
-/*
-int v[3];
-v[0] = 1;
-v[1] = 2;
-v[2] = 3;
-write(red(v));
 */
+int a[5];
+int x, y, z;
+
+read(x);
+read(y);
+
+push (x+1) into a;
+push y*x into a;
+
+
+pop z from a;
+write(z);
+pop z from a;
+write(z);
+
+
+if (is-empty a)
+  write(1);
+else
+  write(0);

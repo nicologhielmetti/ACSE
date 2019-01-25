@@ -154,17 +154,23 @@ t_reg_allocator *RA;       /* Register allocator. It implements the "Linear scan
 
 t_io_infos *file_infos;    /* input and output files used by the compiler */
 
-struct t_stack {
+typedef struct {
   char* id;
   int index_reg;
-} stack = {NULL, 0};
+} t_stack;
 
+t_list stacks;
+
+
+int compareFunction(void * a, void * b){
+  return strcmp(((t_stack*)a)->id,((t_stack*)b)->id);
+}
 
 extern int yylex(void);
 extern int yyerror(const char* errmsg);
 
 
-#line 168 "Acse.tab.c" /* yacc.c:339  */
+#line 174 "Acse.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -254,7 +260,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 108 "Acse.y" /* yacc.c:355  */
+#line 114 "Acse.y" /* yacc.c:355  */
 
    int intval;
    char *svalue;
@@ -264,7 +270,7 @@ union YYSTYPE
    t_axe_label *label;
    t_while_statement while_stmt;
 
-#line 268 "Acse.tab.c" /* yacc.c:355  */
+#line 274 "Acse.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -281,7 +287,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 285 "Acse.tab.c" /* yacc.c:358  */
+#line 291 "Acse.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -583,14 +589,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   178,   178,   191,   192,   195,   202,   206,   213,   222,
-     231,   244,   245,   249,   250,   255,   256,   257,   258,   259,
-     262,   263,   266,   293,   323,   324,   325,   326,   329,   330,
-     333,   350,   383,   389,   388,   408,   414,   407,   428,   437,
-     427,   464,   463,   485,   492,   512,   531,   532,   545,   558,
-     563,   585,   588,   591,   594,   597,   600,   603,   606,   609,
-     612,   615,   618,   621,   622,   623,   624,   625,   626,   644,
-     662,   681
+       0,   184,   184,   197,   198,   201,   208,   212,   219,   228,
+     237,   250,   251,   255,   256,   261,   262,   263,   264,   265,
+     268,   269,   272,   305,   334,   335,   336,   337,   340,   341,
+     344,   361,   394,   400,   399,   419,   425,   418,   439,   448,
+     438,   475,   474,   496,   503,   523,   542,   543,   556,   569,
+     574,   596,   599,   602,   605,   608,   611,   614,   617,   620,
+     623,   626,   629,   632,   633,   634,   635,   636,   637,   655,
+     674,   690
 };
 #endif
 
@@ -1518,7 +1524,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 179 "Acse.y" /* yacc.c:1646  */
+#line 185 "Acse.y" /* yacc.c:1646  */
     {
             /* Notify the end of the program. Once called
              * the function `set_end_Program' - if necessary -
@@ -1529,49 +1535,49 @@ yyreduce:
             /* return from yyparse() */
             YYACCEPT;
          }
-#line 1533 "Acse.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 3:
-#line 191 "Acse.y" /* yacc.c:1646  */
-    { /* does nothing */ }
 #line 1539 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 4:
-#line 192 "Acse.y" /* yacc.c:1646  */
+  case 3:
+#line 197 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1545 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
+  case 4:
+#line 198 "Acse.y" /* yacc.c:1646  */
+    { /* does nothing */ }
+#line 1551 "Acse.tab.c" /* yacc.c:1646  */
+    break;
+
   case 5:
-#line 196 "Acse.y" /* yacc.c:1646  */
+#line 202 "Acse.y" /* yacc.c:1646  */
     {
                      /* update the program infos by adding new variables */
                      set_new_variables(program, (yyvsp[-2].intval), (yyvsp[-1].list));
                   }
-#line 1554 "Acse.tab.c" /* yacc.c:1646  */
+#line 1560 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 203 "Acse.y" /* yacc.c:1646  */
+#line 209 "Acse.y" /* yacc.c:1646  */
     {  /* add the new declaration to the list of declarations */
                      (yyval.list) = addElement((yyvsp[-2].list), (yyvsp[0].decl), -1);
                   }
-#line 1562 "Acse.tab.c" /* yacc.c:1646  */
+#line 1568 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 207 "Acse.y" /* yacc.c:1646  */
+#line 213 "Acse.y" /* yacc.c:1646  */
     {
                      /* add the new declaration to the list of declarations */
                      (yyval.list) = addElement(NULL, (yyvsp[0].decl), -1);
                   }
-#line 1571 "Acse.tab.c" /* yacc.c:1646  */
+#line 1577 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 214 "Acse.y" /* yacc.c:1646  */
+#line 220 "Acse.y" /* yacc.c:1646  */
     {
                /* create a new instance of t_axe_declaration */
                (yyval.decl) = alloc_declaration((yyvsp[-2].svalue), 0, 0, (yyvsp[0].intval));
@@ -1580,11 +1586,11 @@ yyreduce:
                if ((yyval.decl) == NULL)
                   notifyError(AXE_OUT_OF_MEMORY);
             }
-#line 1584 "Acse.tab.c" /* yacc.c:1646  */
+#line 1590 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 223 "Acse.y" /* yacc.c:1646  */
+#line 229 "Acse.y" /* yacc.c:1646  */
     {
                /* create a new instance of t_axe_declaration */
                (yyval.decl) = alloc_declaration((yyvsp[-3].svalue), 1, (yyvsp[-1].intval), 0);
@@ -1593,11 +1599,11 @@ yyreduce:
                if ((yyval.decl) == NULL)
                   notifyError(AXE_OUT_OF_MEMORY);
             }
-#line 1597 "Acse.tab.c" /* yacc.c:1646  */
+#line 1603 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 232 "Acse.y" /* yacc.c:1646  */
+#line 238 "Acse.y" /* yacc.c:1646  */
     {
                /* create a new instance of t_axe_declaration */
                (yyval.decl) = alloc_declaration((yyvsp[0].svalue), 0, 0, 0);
@@ -1606,174 +1612,179 @@ yyreduce:
                if ((yyval.decl) == NULL)
                   notifyError(AXE_OUT_OF_MEMORY);
             }
-#line 1610 "Acse.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 11:
-#line 244 "Acse.y" /* yacc.c:1646  */
-    { /* does nothing */ }
 #line 1616 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 12:
-#line 245 "Acse.y" /* yacc.c:1646  */
+  case 11:
+#line 250 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1622 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 13:
-#line 249 "Acse.y" /* yacc.c:1646  */
+  case 12:
+#line 251 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1628 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 14:
-#line 250 "Acse.y" /* yacc.c:1646  */
+  case 13:
+#line 255 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1634 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 15:
-#line 255 "Acse.y" /* yacc.c:1646  */
+  case 14:
+#line 256 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1640 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 16:
-#line 256 "Acse.y" /* yacc.c:1646  */
+  case 15:
+#line 261 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1646 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 17:
-#line 257 "Acse.y" /* yacc.c:1646  */
+  case 16:
+#line 262 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1652 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 18:
-#line 258 "Acse.y" /* yacc.c:1646  */
+  case 17:
+#line 263 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1658 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 19:
-#line 259 "Acse.y" /* yacc.c:1646  */
-    { gen_nop_instruction(program); }
+  case 18:
+#line 264 "Acse.y" /* yacc.c:1646  */
+    { /* does nothing */ }
 #line 1664 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 262 "Acse.y" /* yacc.c:1646  */
-    { /* does nothing */ }
+  case 19:
+#line 265 "Acse.y" /* yacc.c:1646  */
+    { gen_nop_instruction(program); }
 #line 1670 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 263 "Acse.y" /* yacc.c:1646  */
+  case 20:
+#line 268 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
 #line 1676 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
+  case 21:
+#line 269 "Acse.y" /* yacc.c:1646  */
+    { /* does nothing */ }
+#line 1682 "Acse.tab.c" /* yacc.c:1646  */
+    break;
+
   case 22:
-#line 267 "Acse.y" /* yacc.c:1646  */
+#line 273 "Acse.y" /* yacc.c:1646  */
     {
               t_axe_variable* v = getVariable(program, (yyvsp[0].svalue));
-
-					if ( v->isArray == 0 )
-							notifyError(AXE_SYNTAX_ERROR);
-
-					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
-						stack.id = strdup((yyvsp[0].svalue));
-						stack.index_reg = gen_load_immediate(program, 0);
-					}
-
-					if ( strcmp(stack.id, (yyvsp[0].svalue)) ) 				// if ID is different from the previously stored ID then raise an error
-						notifyError(AXE_SYNTAX_ERROR);
-               else{
-               	t_axe_label *l = newLabel(program);
-               	int r = getNewRegister(program);
-               	gen_subi_instruction(program, r, stack.index_reg, v->arraySize);				// check if stack is not full
-               	gen_beq_instruction(program, l, 0);
-               	storeArrayElement(program, stack.id, create_expression(stack.index_reg, REGISTER), (yyvsp[-2].expr));		// push $2
-               	gen_addi_instruction(program, stack.index_reg, stack.index_reg, 1);								// update the top-of-stack
-               	assignLabel(program, l);																// fix label to avoid push if full
-               }
-               free((yyvsp[0].svalue));
+    					if ( v->isArray == 0 )
+    							notifyError(AXE_SYNTAX_ERROR);
+    					/*if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
+    						stack.id = strdup($4);
+    						stack.index_reg = gen_load_immediate(program, 0);
+    					}*/
+              t_list * elem = CustomfindElement(&stacks,(yyvsp[0].svalue),&compareFunction);
+              if(elem == NULL){
+                t_stack * s = malloc(sizeof(t_stack));
+                s->id = strdup((yyvsp[0].svalue));
+                s->index_reg = gen_load_immediate(program,0);
+                addLast(&stacks,s);
+              }
+    					/*if ( strcmp(stack.id, $4) ) 				// if ID is different from the previously stored ID then raise an error
+    						notifyError(AXE_SYNTAX_ERROR);
+              */
+              else {
+                t_stack * s = (t_stack *)elem->data;
+                t_axe_label *l = newLabel(program);
+                int r = getNewRegister(program);
+                gen_subi_instruction(program, r, s->index_reg, v->arraySize);				// check if stack is not full
+                gen_beq_instruction(program, l, 0);
+                storeArrayElement(program, s->id, create_expression(s->index_reg, REGISTER), (yyvsp[-2].expr));		// push $2
+                gen_addi_instruction(program, s->index_reg, s->index_reg, 1);								// update the top-of-stack
+                assignLabel(program, l);																// fix label to avoid push if full
+              }
+              free((yyvsp[0].svalue));
             }
-#line 1705 "Acse.tab.c" /* yacc.c:1646  */
+#line 1717 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 294 "Acse.y" /* yacc.c:1646  */
+#line 306 "Acse.y" /* yacc.c:1646  */
     {
-              					t_axe_variable* v = getVariable(program, (yyvsp[0].svalue));
-
-              					if ( v->isArray == 0 )
-              							notifyError(AXE_SYNTAX_ERROR);
-
-              					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
-              						stack.id = strdup((yyvsp[0].svalue));
-              						stack.index_reg = gen_load_immediate(program, 0);
-              					}
-
-              					if ( strcmp(stack.id, (yyvsp[0].svalue)) ) 				// if ID is different from the previously stored ID then raise an error
-              						notifyError(AXE_SYNTAX_ERROR);
-                             else{
-                             	t_axe_label *l = newLabel(program);
-                             	int r = getNewRegister(program);
-                             	gen_subi_instruction(program, r, stack.index_reg, 0);				// check if stack is not empty
-                             	gen_beq_instruction(program, l, 0);
-                             	gen_subi_instruction(program, r, stack.index_reg, 1);
-                             	r = loadArrayElement(program, stack.id, create_expression(r, REGISTER));		// pop
-                             	gen_addi_instruction(program, get_symbol_location(program, (yyvsp[-2].svalue), 0), r, 0);
-                             	gen_subi_instruction(program, stack.index_reg, stack.index_reg, 1);								// update the top-of-stack
-                             	assignLabel(program, l);																// fix label to avoid pop if empty
-                             }
-                             free((yyvsp[-2].svalue));
-                             free((yyvsp[0].svalue));
+    					t_axe_variable* v = getVariable(program, (yyvsp[0].svalue));
+    					if ( v->isArray == 0 )
+    							notifyError(AXE_SYNTAX_ERROR);
+              t_list * elem = CustomfindElement(&stacks,(yyvsp[0].svalue),&compareFunction);
+    					if ( elem == NULL ){						// if no stack was previously used then initialize the descriptor
+                notifyError(AXE_SYNTAX_ERROR);
+    					}
+    					/*if ( strcmp(stack.id, $4) ) 				// if ID is different from the previously stored ID then raise an error
+    						notifyError(AXE_SYNTAX_ERROR);
+                   */
+              else{
+                t_stack * s = (t_stack*)elem->data;
+               	t_axe_label *l = newLabel(program);
+               	int r = getNewRegister(program);
+               	gen_subi_instruction(program, r, s->index_reg, 0);				// check if stack is not empty
+               	gen_beq_instruction(program, l, 0);
+               	gen_subi_instruction(program, r, s->index_reg, 1);
+               	r = loadArrayElement(program, s->id, create_expression(r, REGISTER));		// pop
+               	gen_addi_instruction(program, get_symbol_location(program, (yyvsp[-2].svalue), 0), r, 0);
+               	gen_subi_instruction(program, s->index_reg, s->index_reg, 1);								// update the top-of-stack
+               	assignLabel(program, l);																// fix label to avoid pop if empty
+              }
+              free((yyvsp[-2].svalue));
+              free((yyvsp[0].svalue));
             }
-#line 1737 "Acse.tab.c" /* yacc.c:1646  */
+#line 1748 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 323 "Acse.y" /* yacc.c:1646  */
+#line 334 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
-#line 1743 "Acse.tab.c" /* yacc.c:1646  */
+#line 1754 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 324 "Acse.y" /* yacc.c:1646  */
+#line 335 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
-#line 1749 "Acse.tab.c" /* yacc.c:1646  */
+#line 1760 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 325 "Acse.y" /* yacc.c:1646  */
+#line 336 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
-#line 1755 "Acse.tab.c" /* yacc.c:1646  */
+#line 1766 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 326 "Acse.y" /* yacc.c:1646  */
+#line 337 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
-#line 1761 "Acse.tab.c" /* yacc.c:1646  */
+#line 1772 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 329 "Acse.y" /* yacc.c:1646  */
+#line 340 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
-#line 1767 "Acse.tab.c" /* yacc.c:1646  */
+#line 1778 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 330 "Acse.y" /* yacc.c:1646  */
+#line 341 "Acse.y" /* yacc.c:1646  */
     { /* does nothing */ }
-#line 1773 "Acse.tab.c" /* yacc.c:1646  */
+#line 1784 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 334 "Acse.y" /* yacc.c:1646  */
+#line 345 "Acse.y" /* yacc.c:1646  */
     {
                /* Notify to `program' that the value $6
                 * have to be assigned to the location
@@ -1790,11 +1801,11 @@ yyreduce:
                 * by a call to the function `strdup' (see Acse.lex) */
                free((yyvsp[-5].svalue));
             }
-#line 1794 "Acse.tab.c" /* yacc.c:1646  */
+#line 1805 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 351 "Acse.y" /* yacc.c:1646  */
+#line 362 "Acse.y" /* yacc.c:1646  */
     {
                int location;
 
@@ -1825,20 +1836,20 @@ yyreduce:
                /* free the memory associated with the IDENTIFIER */
                free((yyvsp[-2].svalue));
             }
-#line 1829 "Acse.tab.c" /* yacc.c:1646  */
+#line 1840 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 384 "Acse.y" /* yacc.c:1646  */
+#line 395 "Acse.y" /* yacc.c:1646  */
     {
                   /* fix the `label_else' */
                   assignLabel(program, (yyvsp[0].label));
                }
-#line 1838 "Acse.tab.c" /* yacc.c:1646  */
+#line 1849 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 389 "Acse.y" /* yacc.c:1646  */
+#line 400 "Acse.y" /* yacc.c:1646  */
     {
                   /* reserve a new label that points to the address where to jump if
                    * `exp' is verified */
@@ -1850,30 +1861,30 @@ yyreduce:
                   /* fix the `label_else' */
                   assignLabel(program, (yyvsp[-1].label));
                }
-#line 1854 "Acse.tab.c" /* yacc.c:1646  */
+#line 1865 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 401 "Acse.y" /* yacc.c:1646  */
+#line 412 "Acse.y" /* yacc.c:1646  */
     {
                   /* fix the `label_else' */
                   assignLabel(program, (yyvsp[-2].label));
                }
-#line 1863 "Acse.tab.c" /* yacc.c:1646  */
+#line 1874 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 408 "Acse.y" /* yacc.c:1646  */
+#line 419 "Acse.y" /* yacc.c:1646  */
     {
                   /* the label that points to the address where to jump if
                    * `exp' is not verified */
                   (yyvsp[0].label) = newLabel(program);
                }
-#line 1873 "Acse.tab.c" /* yacc.c:1646  */
+#line 1884 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 414 "Acse.y" /* yacc.c:1646  */
+#line 425 "Acse.y" /* yacc.c:1646  */
     {
                      if ((yyvsp[-1].expr).expression_type == IMMEDIATE)
                          gen_load_immediate(program, (yyvsp[-1].expr).value);
@@ -1884,17 +1895,17 @@ yyreduce:
                      /* if `exp' returns FALSE, jump to the label $1 */
                      gen_beq_instruction (program, (yyvsp[-4].label), 0);
                }
-#line 1888 "Acse.tab.c" /* yacc.c:1646  */
+#line 1899 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 424 "Acse.y" /* yacc.c:1646  */
+#line 435 "Acse.y" /* yacc.c:1646  */
     { (yyval.label) = (yyvsp[-6].label); }
-#line 1894 "Acse.tab.c" /* yacc.c:1646  */
+#line 1905 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 428 "Acse.y" /* yacc.c:1646  */
+#line 439 "Acse.y" /* yacc.c:1646  */
     {
                      /* initialize the value of the non-terminal */
                      (yyvsp[0].while_stmt) = create_while_statement();
@@ -1903,11 +1914,11 @@ yyreduce:
                      (yyvsp[0].while_stmt).label_condition
                            = assignNewLabel(program);
                   }
-#line 1907 "Acse.tab.c" /* yacc.c:1646  */
+#line 1918 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 437 "Acse.y" /* yacc.c:1646  */
+#line 448 "Acse.y" /* yacc.c:1646  */
     {
                      if ((yyvsp[-1].expr).expression_type == IMMEDIATE)
                         gen_load_immediate(program, (yyvsp[-1].expr).value);
@@ -1923,11 +1934,11 @@ yyreduce:
                      /* if `exp' returns FALSE, jump to the label $1.label_end */
                      gen_beq_instruction (program, (yyvsp[-4].while_stmt).label_end, 0);
                   }
-#line 1927 "Acse.tab.c" /* yacc.c:1646  */
+#line 1938 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 453 "Acse.y" /* yacc.c:1646  */
+#line 464 "Acse.y" /* yacc.c:1646  */
     {
                      /* jump to the beginning of the loop */
                      gen_bt_instruction
@@ -1936,11 +1947,11 @@ yyreduce:
                      /* fix the label `label_end' */
                      assignLabel(program, (yyvsp[-6].while_stmt).label_end);
                   }
-#line 1940 "Acse.tab.c" /* yacc.c:1646  */
+#line 1951 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 464 "Acse.y" /* yacc.c:1646  */
+#line 475 "Acse.y" /* yacc.c:1646  */
     {
                         /* the label that points to the address where to jump if
                          * `exp' is not verified */
@@ -1949,11 +1960,11 @@ yyreduce:
                         /* fix the label */
                         assignLabel(program, (yyvsp[0].label));
                      }
-#line 1953 "Acse.tab.c" /* yacc.c:1646  */
+#line 1964 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 473 "Acse.y" /* yacc.c:1646  */
+#line 484 "Acse.y" /* yacc.c:1646  */
     {
                            if ((yyvsp[-1].expr).expression_type == IMMEDIATE)
                                gen_load_immediate(program, (yyvsp[-1].expr).value);
@@ -1964,20 +1975,20 @@ yyreduce:
                            /* if `exp' returns TRUE, jump to the label $1 */
                            gen_bne_instruction (program, (yyvsp[-6].label), 0);
                      }
-#line 1968 "Acse.tab.c" /* yacc.c:1646  */
+#line 1979 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 486 "Acse.y" /* yacc.c:1646  */
+#line 497 "Acse.y" /* yacc.c:1646  */
     {
                /* insert an HALT instruction */
                gen_halt_instruction(program);
             }
-#line 1977 "Acse.tab.c" /* yacc.c:1646  */
+#line 1988 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 493 "Acse.y" /* yacc.c:1646  */
+#line 504 "Acse.y" /* yacc.c:1646  */
     {
                int location;
 
@@ -1995,11 +2006,11 @@ yyreduce:
                /* free the memory associated with the IDENTIFIER */
                free((yyvsp[-1].svalue));
             }
-#line 1999 "Acse.tab.c" /* yacc.c:1646  */
+#line 2010 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 513 "Acse.y" /* yacc.c:1646  */
+#line 524 "Acse.y" /* yacc.c:1646  */
     {
 
                int location;
@@ -2016,17 +2027,17 @@ yyreduce:
                /* write to standard output an integer value */
                gen_write_instruction (program, location);
             }
-#line 2020 "Acse.tab.c" /* yacc.c:1646  */
+#line 2031 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 531 "Acse.y" /* yacc.c:1646  */
+#line 542 "Acse.y" /* yacc.c:1646  */
     { (yyval.expr) = create_expression ((yyvsp[0].intval), IMMEDIATE); }
-#line 2026 "Acse.tab.c" /* yacc.c:1646  */
+#line 2037 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 532 "Acse.y" /* yacc.c:1646  */
+#line 543 "Acse.y" /* yacc.c:1646  */
     {
                      int location;
 
@@ -2040,11 +2051,11 @@ yyreduce:
                      /* free the memory associated with the IDENTIFIER */
                      free((yyvsp[0].svalue));
    }
-#line 2044 "Acse.tab.c" /* yacc.c:1646  */
+#line 2055 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 545 "Acse.y" /* yacc.c:1646  */
+#line 556 "Acse.y" /* yacc.c:1646  */
     {
                      int reg;
 
@@ -2058,21 +2069,21 @@ yyreduce:
                      /* free the memory associated with the IDENTIFIER */
                      free((yyvsp[-3].svalue));
    }
-#line 2062 "Acse.tab.c" /* yacc.c:1646  */
+#line 2073 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 558 "Acse.y" /* yacc.c:1646  */
+#line 569 "Acse.y" /* yacc.c:1646  */
     {  if ((yyvsp[0].intval) == 0)
                            (yyval.expr) = create_expression (1, IMMEDIATE);
                         else
                            (yyval.expr) = create_expression (0, IMMEDIATE);
    }
-#line 2072 "Acse.tab.c" /* yacc.c:1646  */
+#line 2083 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 563 "Acse.y" /* yacc.c:1646  */
+#line 574 "Acse.y" /* yacc.c:1646  */
     {
                            int identifier_location;
                            int output_register;
@@ -2095,137 +2106,137 @@ yyreduce:
                            /* free the memory associated with the IDENTIFIER */
                            free((yyvsp[0].svalue));
    }
-#line 2099 "Acse.tab.c" /* yacc.c:1646  */
+#line 2110 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 585 "Acse.y" /* yacc.c:1646  */
+#line 596 "Acse.y" /* yacc.c:1646  */
     {
                            (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), ANDB);
    }
-#line 2107 "Acse.tab.c" /* yacc.c:1646  */
+#line 2118 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 588 "Acse.y" /* yacc.c:1646  */
+#line 599 "Acse.y" /* yacc.c:1646  */
     {
                            (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), ORB);
    }
-#line 2115 "Acse.tab.c" /* yacc.c:1646  */
+#line 2126 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 591 "Acse.y" /* yacc.c:1646  */
+#line 602 "Acse.y" /* yacc.c:1646  */
     {
                            (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), ADD);
    }
-#line 2123 "Acse.tab.c" /* yacc.c:1646  */
+#line 2134 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 594 "Acse.y" /* yacc.c:1646  */
+#line 605 "Acse.y" /* yacc.c:1646  */
     {
                            (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), SUB);
    }
-#line 2131 "Acse.tab.c" /* yacc.c:1646  */
+#line 2142 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 597 "Acse.y" /* yacc.c:1646  */
+#line 608 "Acse.y" /* yacc.c:1646  */
     {
                            (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), MUL);
    }
-#line 2139 "Acse.tab.c" /* yacc.c:1646  */
+#line 2150 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 600 "Acse.y" /* yacc.c:1646  */
+#line 611 "Acse.y" /* yacc.c:1646  */
     {
                            (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), DIV);
    }
-#line 2147 "Acse.tab.c" /* yacc.c:1646  */
+#line 2158 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 603 "Acse.y" /* yacc.c:1646  */
+#line 614 "Acse.y" /* yacc.c:1646  */
     {
                         (yyval.expr) = handle_binary_comparison (program, (yyvsp[-2].expr), (yyvsp[0].expr), _LT_);
    }
-#line 2155 "Acse.tab.c" /* yacc.c:1646  */
+#line 2166 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 606 "Acse.y" /* yacc.c:1646  */
+#line 617 "Acse.y" /* yacc.c:1646  */
     {
                         (yyval.expr) = handle_binary_comparison (program, (yyvsp[-2].expr), (yyvsp[0].expr), _GT_);
    }
-#line 2163 "Acse.tab.c" /* yacc.c:1646  */
+#line 2174 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 609 "Acse.y" /* yacc.c:1646  */
+#line 620 "Acse.y" /* yacc.c:1646  */
     {
                         (yyval.expr) = handle_binary_comparison (program, (yyvsp[-2].expr), (yyvsp[0].expr), _EQ_);
    }
-#line 2171 "Acse.tab.c" /* yacc.c:1646  */
+#line 2182 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 612 "Acse.y" /* yacc.c:1646  */
+#line 623 "Acse.y" /* yacc.c:1646  */
     {
                         (yyval.expr) = handle_binary_comparison (program, (yyvsp[-2].expr), (yyvsp[0].expr), _NOTEQ_);
    }
-#line 2179 "Acse.tab.c" /* yacc.c:1646  */
+#line 2190 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 615 "Acse.y" /* yacc.c:1646  */
+#line 626 "Acse.y" /* yacc.c:1646  */
     {
                         (yyval.expr) = handle_binary_comparison (program, (yyvsp[-2].expr), (yyvsp[0].expr), _LTEQ_);
    }
-#line 2187 "Acse.tab.c" /* yacc.c:1646  */
+#line 2198 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 618 "Acse.y" /* yacc.c:1646  */
+#line 629 "Acse.y" /* yacc.c:1646  */
     {
                         (yyval.expr) = handle_binary_comparison (program, (yyvsp[-2].expr), (yyvsp[0].expr), _GTEQ_);
    }
-#line 2195 "Acse.tab.c" /* yacc.c:1646  */
+#line 2206 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 621 "Acse.y" /* yacc.c:1646  */
+#line 632 "Acse.y" /* yacc.c:1646  */
     {  (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), SHL); }
-#line 2201 "Acse.tab.c" /* yacc.c:1646  */
+#line 2212 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 622 "Acse.y" /* yacc.c:1646  */
+#line 633 "Acse.y" /* yacc.c:1646  */
     {  (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), SHR); }
-#line 2207 "Acse.tab.c" /* yacc.c:1646  */
+#line 2218 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 623 "Acse.y" /* yacc.c:1646  */
+#line 634 "Acse.y" /* yacc.c:1646  */
     {  (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), ANDL); }
-#line 2213 "Acse.tab.c" /* yacc.c:1646  */
+#line 2224 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 624 "Acse.y" /* yacc.c:1646  */
+#line 635 "Acse.y" /* yacc.c:1646  */
     {  (yyval.expr) = handle_bin_numeric_op(program, (yyvsp[-2].expr), (yyvsp[0].expr), ORL); }
-#line 2219 "Acse.tab.c" /* yacc.c:1646  */
+#line 2230 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 625 "Acse.y" /* yacc.c:1646  */
+#line 636 "Acse.y" /* yacc.c:1646  */
     { (yyval.expr) = (yyvsp[-1].expr); }
-#line 2225 "Acse.tab.c" /* yacc.c:1646  */
+#line 2236 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 626 "Acse.y" /* yacc.c:1646  */
+#line 637 "Acse.y" /* yacc.c:1646  */
     {
                         if ((yyvsp[0].expr).expression_type == IMMEDIATE)
                         {
@@ -2244,11 +2255,11 @@ yyreduce:
                                  (program, exp_r0, (yyvsp[0].expr), SUB);
                         }
                      }
-#line 2248 "Acse.tab.c" /* yacc.c:1646  */
+#line 2259 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 644 "Acse.y" /* yacc.c:1646  */
+#line 656 "Acse.y" /* yacc.c:1646  */
     {
                      (yyval.expr) = create_expression(getNewRegister(program),REGISTER);
                      int i_reg = getNewRegister(program);
@@ -2267,59 +2278,51 @@ yyreduce:
                      gen_bne_instruction(program,backedge,0);
                      free((yyvsp[-1].svalue));
                    }
-#line 2271 "Acse.tab.c" /* yacc.c:1646  */
+#line 2282 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 662 "Acse.y" /* yacc.c:1646  */
+#line 675 "Acse.y" /* yacc.c:1646  */
     {
-					t_axe_variable* v = getVariable(program, (yyvsp[0].svalue));
-
-					if ( v->isArray == 0 )
-							notifyError(AXE_SYNTAX_ERROR);
-
-					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
-						stack.id = strdup((yyvsp[0].svalue));
-						stack.index_reg = gen_load_immediate(program, 0);
-						(yyval.expr) = create_expression(1, IMMEDIATE);
-					}
-					else{
-						if ( strcmp(stack.id, (yyvsp[0].svalue)) ) 				   // if ID is different from the previously stored ID then raise an error
-							notifyError(AXE_SYNTAX_ERROR);
-		            else
-		            	(yyval.expr) = handle_binary_comparison (program, create_expression(stack.index_reg, REGISTER), create_expression(0, IMMEDIATE), _EQ_);
-					}
-               free((yyvsp[0].svalue));
-                   }
-#line 2295 "Acse.tab.c" /* yacc.c:1646  */
+					            t_axe_variable* v = getVariable(program, (yyvsp[0].svalue));
+					            if ( v->isArray == 0 )
+							          notifyError(AXE_SYNTAX_ERROR);
+                      t_list * elem = CustomfindElement(&stacks,(yyvsp[0].svalue),&compareFunction);
+            					if ( elem == NULL )						// if no stack was previously used then initialize the descriptor
+                        notifyError(AXE_SYNTAX_ERROR);
+            					/*else{
+            						if ( strcmp(stack.id, $2) ) 				   // if ID is different from the previously stored ID then raise an error
+            							notifyError(AXE_SYNTAX_ERROR);
+            		            else*/
+                      t_stack * s = (t_stack *)elem->data;
+            		      (yyval.expr) = handle_binary_comparison (program, create_expression(s->index_reg, REGISTER), create_expression(0, IMMEDIATE), _EQ_);
+                      free((yyvsp[0].svalue));
+            			 }
+#line 2302 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 681 "Acse.y" /* yacc.c:1646  */
+#line 691 "Acse.y" /* yacc.c:1646  */
     {
-    t_axe_variable* v = getVariable(program, (yyvsp[0].svalue));
-
-					if ( v->isArray == 0 )
-							notifyError(AXE_SYNTAX_ERROR);
-
-					if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
-						stack.id = strdup((yyvsp[0].svalue));
-						stack.index_reg = gen_load_immediate(program, 0);
-						(yyval.expr) = create_expression(0, IMMEDIATE);
-					}
-					else{
-						if ( strcmp(stack.id, (yyvsp[0].svalue)) ) 				   // if ID is different from the previously stored ID then raise an error
-							notifyError(AXE_SYNTAX_ERROR);
-		            else
-		            	(yyval.expr) = handle_binary_comparison (program, create_expression(stack.index_reg, REGISTER), create_expression(v->arraySize, IMMEDIATE), _EQ_);
-					}
-               free((yyvsp[0].svalue));
-                   }
-#line 2319 "Acse.tab.c" /* yacc.c:1646  */
+                      t_axe_variable* v = getVariable(program, (yyvsp[0].svalue));
+            					if ( v->isArray == 0 )
+            							notifyError(AXE_SYNTAX_ERROR);
+                      t_list * elem = CustomfindElement(&stacks,(yyvsp[0].svalue),&compareFunction);
+                  		if (elem == NULL )						// if no stack was previously used then initialize the descriptor
+                        notifyError(AXE_SYNTAX_ERROR);
+            					/*else{
+            						if ( strcmp(stack.id, $2) ) 				   // if ID is different from the previously stored ID then raise an error
+            							notifyError(AXE_SYNTAX_ERROR);
+            		            else*/
+                       t_stack * s = (t_stack *)elem->data;
+            		       (yyval.expr) = handle_binary_comparison (program, create_expression(s->index_reg, REGISTER), create_expression(v->arraySize, IMMEDIATE), _EQ_);
+                       free((yyvsp[0].svalue));
+                  }
+#line 2322 "Acse.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2323 "Acse.tab.c" /* yacc.c:1646  */
+#line 2326 "Acse.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2547,7 +2550,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 702 "Acse.y" /* yacc.c:1906  */
+#line 708 "Acse.y" /* yacc.c:1906  */
 
 /*=========================================================================
                                   MAIN
@@ -2630,6 +2633,7 @@ int main (int argc, char **argv)
    fprintf(stdout, "Assembly written on file \"%s\".\n", file_infos->output_file_name);
 #endif
 
+//freeList(&stacks);
    /* shutdown the compiler */
    shutdownCompiler(0);
 
