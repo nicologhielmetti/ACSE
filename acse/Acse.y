@@ -94,11 +94,16 @@ typedef struct {
   int index_reg;
 } t_stack;
 
-t_list stacks;
-
+t_list* stacks;
 
 int compareFunction(void * a, void * b){
-  return strcmp(((t_stack*)a)->id,((t_stack*)b)->id);
+  t_stack * s = (t_stack *) a;
+  char * e = (char *) b;
+  if(s == NULL || e == NULL) return 0;
+  if(strcmp(s->id, e) == 0) //they are equal?
+    return 1;
+  else
+    return 0;
 }
 
 extern int yylex(void);
@@ -261,74 +266,8 @@ statements  : statements statement       { /* does nothing */ }
 statement   : assign_statement SEMI      { /* does nothing */ }
             | control_statement          { /* does nothing */ }
             | read_write_statement SEMI  { /* does nothing */ }
-            | push_pop_statement         { /* does nothing */ }
             | SEMI            { gen_nop_instruction(program); }
-;
-
-push_pop_statement : push_statement      { /* does nothing */ }
-            | pop_statement              { /* does nothing */ }
-;
-
-push_statement : PUSH exp INTO IDENTIFIER
-            {
-              t_axe_variable* v = getVariable(program, $4);
-    					if ( v->isArray == 0 )
-    							notifyError(AXE_SYNTAX_ERROR);
-    					/*if ( stack.id == NULL ){						// if no stack was previously used then initialize the descriptor
-    						stack.id = strdup($4);
-    						stack.index_reg = gen_load_immediate(program, 0);
-    					}*/
-              t_list * elem = CustomfindElement(&stacks,$4,&compareFunction);
-              if(elem == NULL){
-                t_stack * s = malloc(sizeof(t_stack));
-                s->id = strdup($4);
-                s->index_reg = gen_load_immediate(program,0);
-                addLast(&stacks,s);
-              }
-    					/*if ( strcmp(stack.id, $4) ) 				// if ID is different from the previously stored ID then raise an error
-    						notifyError(AXE_SYNTAX_ERROR);
-              */
-              else {
-                t_stack * s = (t_stack *)elem->data;
-                t_axe_label *l = newLabel(program);
-                int r = getNewRegister(program);
-                gen_subi_instruction(program, r, s->index_reg, v->arraySize);				// check if stack is not full
-                gen_beq_instruction(program, l, 0);
-                storeArrayElement(program, s->id, create_expression(s->index_reg, REGISTER), $2);		// push $2
-                gen_addi_instruction(program, s->index_reg, s->index_reg, 1);								// update the top-of-stack
-                assignLabel(program, l);																// fix label to avoid push if full
-              }
-              free($4);
-            }
-;
-
-pop_statement : POP IDENTIFIER FROM IDENTIFIER
-            {
-    					t_axe_variable* v = getVariable(program, $4);
-    					if ( v->isArray == 0 )
-    							notifyError(AXE_SYNTAX_ERROR);
-              t_list * elem = CustomfindElement(&stacks,$4,&compareFunction);
-    					if ( elem == NULL ){						// if no stack was previously used then initialize the descriptor
-                notifyError(AXE_SYNTAX_ERROR);
-    					}
-    					/*if ( strcmp(stack.id, $4) ) 				// if ID is different from the previously stored ID then raise an error
-    						notifyError(AXE_SYNTAX_ERROR);
-                   */
-              else{
-                t_stack * s = (t_stack*)elem->data;
-               	t_axe_label *l = newLabel(program);
-               	int r = getNewRegister(program);
-               	gen_subi_instruction(program, r, s->index_reg, 0);				// check if stack is not empty
-               	gen_beq_instruction(program, l, 0);
-               	gen_subi_instruction(program, r, s->index_reg, 1);
-               	r = loadArrayElement(program, s->id, create_expression(r, REGISTER));		// pop
-               	gen_addi_instruction(program, get_symbol_location(program, $2, 0), r, 0);
-               	gen_subi_instruction(program, s->index_reg, s->index_reg, 1);								// update the top-of-stack
-               	assignLabel(program, l);																// fix label to avoid pop if empty
-              }
-              free($2);
-              free($4);
-            }
+            | push_pop_statement         { /* does nothing */ }
 ;
 
 control_statement : if_statement         { /* does nothing */ }
@@ -339,6 +278,10 @@ control_statement : if_statement         { /* does nothing */ }
 
 read_write_statement : read_statement  { /* does nothing */ }
                      | write_statement { /* does nothing */ }
+;
+
+push_pop_statement : push_statement      { /* does nothing */ }
+            | pop_statement              { /* does nothing */ }
 ;
 
 assign_statement : IDENTIFIER LSQUARE exp RSQUARE ASSIGN exp
@@ -539,6 +482,56 @@ write_statement : WRITE LPAR exp RPAR
             }
 ;
 
+push_statement : PUSH exp INTO IDENTIFIER
+            {
+              t_axe_variable* v = getVariable(program, $4);
+    					if (v->isArray == 0 )
+    					  notifyError(AXE_SYNTAX_ERROR);//yyerror("Syntax error: it is possible to push only inside a declared array");
+              t_list * elem = CustomfindElement(stacks,$4,&compareFunction);
+              if(elem == NULL){
+                t_stack * s = malloc(sizeof(t_stack));
+                s->id = strdup($4);
+                s->index_reg = gen_load_immediate(program,0);
+                addLast(stacks,s);
+              } else {
+                t_stack * s = (t_stack *)elem->data;
+                t_axe_label *l = newLabel(program);
+                int r = getNewRegister(program);
+                gen_subi_instruction(program, r, s->index_reg, v->arraySize);				// check if stack is not full
+                gen_beq_instruction(program, l, 0);
+                storeArrayElement(program, s->id, create_expression(s->index_reg, REGISTER), $2);		// push $2
+                gen_addi_instruction(program, s->index_reg, s->index_reg, 1);								// update the top-of-stack
+                assignLabel(program, l);																// fix label to avoid push if full
+              }
+              free($4);
+            }
+;
+
+pop_statement : POP IDENTIFIER FROM IDENTIFIER
+            {
+    					t_axe_variable* v = getVariable(program, $4);
+    					if (v->isArray == 0 )
+                notifyError(AXE_SYNTAX_ERROR);//yyerror("Syntax error: it is possible to pop only from a declared array");
+              t_list * elem = CustomfindElement(stacks,$4,&compareFunction);
+    					if ( elem == NULL ){						// if no stack was previously used then initialize the descriptor
+                notifyError(AXE_SYNTAX_ERROR);//yyerror("Error: you cannot pop from an array which is not previously pushed");
+    					} else {
+                t_stack * s = (t_stack*)elem->data;
+               	t_axe_label *l = newLabel(program);
+               	int r = getNewRegister(program);
+               	gen_subi_instruction(program, r, s->index_reg, 0);				// check if stack is not empty
+               	gen_beq_instruction(program, l, 0);
+               	gen_subi_instruction(program, r, s->index_reg, 1);
+               	r = loadArrayElement(program, s->id, create_expression(r, REGISTER));		// pop
+               	gen_addi_instruction(program, get_symbol_location(program, $2, 0), r, 0);
+               	gen_subi_instruction(program, s->index_reg, s->index_reg, 1);								// update the top-of-stack
+               	assignLabel(program, l);																// fix label to avoid pop if empty
+              }
+              free($2);
+              free($4);
+            }
+;
+
 exp: NUMBER      { $$ = create_expression ($1, IMMEDIATE); }
    | IDENTIFIER  {
                      int location;
@@ -675,10 +668,10 @@ exp: NUMBER      { $$ = create_expression ($1, IMMEDIATE); }
                    {
 					            t_axe_variable* v = getVariable(program, $2);
 					            if ( v->isArray == 0 )
-							          notifyError(AXE_SYNTAX_ERROR);
-                      t_list * elem = CustomfindElement(&stacks,$2,&compareFunction);
+                        notifyError(AXE_SYNTAX_ERROR);//yyerror("Syntax error: is-empty operator can be applied only to arrays");
+                      t_list * elem = CustomfindElement(stacks,$2,&compareFunction);
             					if ( elem == NULL )						// if no stack was previously used then initialize the descriptor
-                        notifyError(AXE_SYNTAX_ERROR);
+                        notifyError(AXE_SYNTAX_ERROR);//yyerror("Error: you cannot check with is-empty from an array which is not previously pushed");
             					/*else{
             						if ( strcmp(stack.id, $2) ) 				   // if ID is different from the previously stored ID then raise an error
             							notifyError(AXE_SYNTAX_ERROR);
@@ -690,11 +683,12 @@ exp: NUMBER      { $$ = create_expression ($1, IMMEDIATE); }
   | IS_FULL IDENTIFIER
                    {
                       t_axe_variable* v = getVariable(program, $2);
-            					if ( v->isArray == 0 )
-            							notifyError(AXE_SYNTAX_ERROR);
-                      t_list * elem = CustomfindElement(&stacks,$2,&compareFunction);
+            					if ( v->isArray == 0 ){
+                        notifyError(AXE_SYNTAX_ERROR);//yyerror("Syntax error: is-full operator can be applied only to arrays");
+                      }
+                      t_list * elem = CustomfindElement(stacks,$2,&compareFunction);
                   		if (elem == NULL )						// if no stack was previously used then initialize the descriptor
-                        notifyError(AXE_SYNTAX_ERROR);
+                        notifyError(AXE_SYNTAX_ERROR);//yyerror("Error: you cannot check with is-full from an array which is not previously pushed");
             					/*else{
             						if ( strcmp(stack.id, $2) ) 				   // if ID is different from the previously stored ID then raise an error
             							notifyError(AXE_SYNTAX_ERROR);
@@ -787,7 +781,7 @@ int main (int argc, char **argv)
    fprintf(stdout, "Assembly written on file \"%s\".\n", file_infos->output_file_name);
 #endif
 
-//freeList(&stacks);
+freeList(stacks);
    /* shutdown the compiler */
    shutdownCompiler(0);
 
